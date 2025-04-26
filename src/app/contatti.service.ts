@@ -1,33 +1,30 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Persona } from 'src/Persona';
+import { Contatto } from 'src/Persona';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContattiService {
+  url = 'http://localhost:3000/contatti';
 
-  url='http://localhost:3000/Persona';
+  constructor(private http: HttpClient) {}
 
-  constructor(private http : HttpClient) { }
-
-  get():Observable<Persona[]>{
-   return this.http.get<Persona[]>(this.url)
+  get(): Observable<Contatto[]> {
+    return this.http.get<Contatto[]>(this.url);
   }
-  post(persona : Persona):Observable<Persona>{
-    return this.http.post<Persona>(this.url,persona)
+  post(contatto: Contatto): Observable<Contatto> {
+    return this.http.post<Contatto>(this.url, contatto);
   }
-  put(id:number, persona:Persona):Observable<Persona>{
-    console.log(persona)
-    return this.http.put<Persona>(`${this.url}/${id}`, persona)
-
+  put(id: number, contatto: Contatto): Observable<Contatto> {
+    return this.http.put<Contatto>(`${this.url}/${id}/`, contatto);
   }
-  delete(id:Number):Observable<Persona>{
-    return this.http.delete<Persona>(this.url+"/"+id)
+  delete(id: Number): Observable<Contatto> {
+    console.log(this.url + '/' + id);
+    return this.http.delete<Contatto>(this.url + '/' + id);
   }
-  getById(id:number):Observable<Persona>{
-      return this.http.get<Persona>(this.url+"/"+id)
+  getById(id: number): Observable<Contatto> {
+    return this.http.get<Contatto>(this.url + '/' + id);
   }
-
 }

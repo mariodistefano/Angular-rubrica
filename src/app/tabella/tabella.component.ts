@@ -1,50 +1,42 @@
-import { Persona } from 'src/Persona';
 import { ContattiService } from './../contatti.service';
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  signal,
+  SimpleChanges,
+} from '@angular/core';
 import { Router } from '@angular/router';
+import { Contatto } from 'src/Persona';
 @Component({
   selector: 'app-tabella',
   templateUrl: './tabella.component.html',
-  styleUrls: ['./tabella.component.css']
+  styleUrls: ['./tabella.component.css'],
 })
-export class TabellaComponent implements OnInit, OnChanges , OnDestroy{
-  @Input() filtroRicevuto?:any
-  persone?:Persona[]
-  personeCopia?:Persona[]
-  subscription:any;
-
-  constructor(
-    private router:Router,
-    private contattiService:ContattiService){
-  }
-  ngOnDestroy(){
-    this.subscription.unsubscribe()
-  }
-  ngOnChanges() {
-    this.filtra()
+export class TabellaComponent implements OnInit, OnDestroy {
+  @Input() filtroRicevuto?: string;
+  contacts = signal<Contatto[]>([]);
+  contactService = inject(ContattiService);
+  router = inject(Router);
+  ngOnDestroy(): void {}
+  ngOnInit(): void {
+    this.contactService.get().subscribe((contatti) => {
+      this.contacts.set(contatti);
+    });
   }
 
-  ngOnInit() {
-    this.subscription= this.contattiService.get().subscribe((persone)=>{
-     this.persone = persone,
-    this.personeCopia=this.persone})
+  eliminaContatto(contattoId: number) {
+    this.contactService.delete(contattoId).subscribe(() => {
+      this.contacts.update((contatti) =>
+        contatti.filter((contatto) => contatto.id !== contattoId),
+      );
+    });
   }
 
-
-    eliminaContatto(id:number) {
-      //    in questa parte chiamo ngOnInit per far ripartire la get cosichè si aggiorni subito la vista
-      this.contattiService.delete(id).subscribe(()=>{this.ngOnInit()})
-    }
-    modificaContatto(id:number) {
-      this.router.navigateByUrl("form/"+id)
-
-    }
-
-    filtra(){
-      this.persone=this.personeCopia
-      if (this.filtroRicevuto) {
-          this.persone = this.persone?.filter((persona)=>persona.name.toLowerCase().startsWith(this.filtroRicevuto.toLowerCase()))
-      }
-
-    }
+  modificaContatto(contattoId: number) {
+    this.router.navigateByUrl('/form/' + contattoId);
+  }
 }

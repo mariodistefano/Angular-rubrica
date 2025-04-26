@@ -1,51 +1,51 @@
 import { ContattiService } from './../contatti.service';
 import { Component, DoCheck, OnInit } from '@angular/core';
-import { Persona } from 'src/Persona';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { Contatto } from 'src/Persona';
 
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
-  styleUrls: ['./form.component.css']
+  styleUrls: ['./form.component.css'],
 })
 export class FormComponent implements OnInit, DoCheck {
-  idCatturato:any=-1;
-  persona:Persona = new Persona
-  isModifica:boolean = false;
+  idCatturato: any = -1;
+  contatto: Contatto = new Contatto();
+  isModifica: boolean = false;
+
   constructor(
-    private contattiService:ContattiService,
-    private router:Router,
-    private activatedRoute:ActivatedRoute){ }
+    private contattiService: ContattiService,
+    private activatedRoute: ActivatedRoute,
+  ) {}
+
   ngDoCheck() {
-    this.ngOnInit()
+    this.ngOnInit();
   }
 
-  ngOnInit(){
-    let numero = this.activatedRoute.snapshot.paramMap.get("id")
+  ngOnInit() {
+    let numero = this.activatedRoute.snapshot.paramMap.get('id');
+    this.idCatturato = numero;
 
-    this.idCatturato = numero
-
-    if (this.idCatturato === ":id") {
-        this.isModifica=false
-        this.persona=new Persona
-
-    }else{
-      this.isModifica=true
-      if(this.persona.name === undefined || null){
-      this.contattiService.getById(this.idCatturato).subscribe((persona)=>this.persona=persona)
+    if (this.idCatturato === ':id') {
+      this.isModifica = false;
+      this.contatto = new Contatto();
+    } else {
+      this.isModifica = true;
+      if (this.contatto.name === '') {
+        this.contattiService
+          .getById(this.idCatturato)
+          .subscribe((contatto) => (this.contatto = contatto));
       }
     }
   }
-  aggiungi(persona:Persona) {
-    this.contattiService.post(persona).subscribe()
-    // this.router.navigateByUrl("/")
-    location.replace("/")
+
+  aggiungi(contatto: Contatto) {
+    this.contattiService.post(contatto).subscribe();
   }
-  modifica(persona:Persona) {
-    this.contattiService.put(this.idCatturato,persona).subscribe()
-    // this.router.navigateByUrl("/")
-    location.replace("/")
 
-
+  modifica(contatto: Contatto) {
+    this.contattiService.put(this.idCatturato, contatto).subscribe(() => {
+      this.contatto = contatto;
+    });
   }
 }
